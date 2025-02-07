@@ -9,12 +9,16 @@ export function Card({
   onClick,
   deleteIcons,
   deleteClick,
+  deleteClassName,
+  DeleteName
 }: {
   className?: string;
   title: string;
   children?: React.ReactNode;
   textClassName?: string;
   titleClassName?: string;
+  deleteClassName?:string;
+  DeleteName?:string;
   onClick?: () => void;
   deleteIcons?: any;
   deleteClick?: () => void;
@@ -29,7 +33,7 @@ export function Card({
         onClick={deleteClick}
         className="delete text-black m-2 font-bold cursor-pointer text-lg"
       >
-        <div className="px-3 py-2 flex h-[20px] items-center gap-1 ">{deleteIcons}Delete</div>
+        <div className={deleteClassName}>{deleteIcons}{DeleteName}</div>
       </div>
     </div>
   );

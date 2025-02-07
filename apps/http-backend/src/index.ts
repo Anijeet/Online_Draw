@@ -44,58 +44,54 @@ app.post('/signup',async (req,res)=>{
 
 })
 
-app.post('/signin',async (req,res)=>{
+//@ts-ignore
+app.post('/signin', async (req, res) => {
+    const parsedData = SigninSchema.safeParse(req.body);
     
-        const paresedData=SigninSchema.safeParse(req.body)
-    if(!paresedData.success){
-        res.status(501).json({
-            message:"Incorrect inputs"
-        })
-        return;
-    }
-    try {
-    const user = await prismaClient.user.findFirst({
-        where:{
-            email:paresedData.data.username
-        }
-    })
-
-    if(!user){
-        res.status(403).json({
-            message:"User not found"
-        })
+    if (!parsedData.success) {
+        return res.status(400).json({ message: "Incorrect inputs" });
     }
 
     try {
-        //@ts-ignore
-        const passwordmatch= await bcrypt.compare(paresedData.data.password,user.password)
+        const user = await prismaClient.user.findFirst({
+            where: { email: parsedData.data.username }
+        });
 
-        if(passwordmatch){
-            const token=jwt.sign({
-                userId:user?.id
-            },JWT_SECRET)
-
-            res.json({
-                token:token,
-                //@ts-ignore
-                userid:user.id
-            })
-        }else{
-            res.status(501).json({
-                message:"Incorrect password"
-            })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" }); 
         }
 
+        const passwordMatch = await bcrypt.compare(parsedData.data.password, user.password);
+
+        if (!passwordMatch) {
+            return res.status(401).json({ message: "Incorrect password" }); 
+        }
+
+        const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+        return res.json({ token, userid: user.id });
+
     } catch (error) {
-        res.status(501).json({
-            messsage:"incorrect password"
+        console.error("Error during sign-in:", error);
+        return res.status(500).json({ message: "Something went wrong. Please try again." });
+    }
+});
+
+app.get('/check-roomsid/:roomId',async(req,res)=>{
+    //@ts-ignore
+    const roomId=parseInt(req.params.roomId)
+    const id = await prismaClient.room.findFirst({where:{id:roomId}})
+    if(id){
+        res.status(200).json({
+            msg:"Id exist"
+        })
+    }else{
+        res.status(404).json({
+            msg:"Id doesn't exist"
         })
     }
-    } catch (error) {
-        res.status(501).json({msg:"Invalid Credentials"})
-    }
-    
 })
+
 
 
 app.post('/room',middleware,async (req,res)=>{
@@ -197,14 +193,25 @@ app.post("/chats/delete-shape", async (req, res) => {
     
     try {
         const {message} = req.body ;
-        console.log(message)
+        const shapeId=message.shape.id
+        console.log(shapeId)
         //@ts-ignore
-        const deletedShape = await prismaClient.chat.delete({ where:{message:message} });
-
-        if (!deletedShape) {
-            return res.status(404).json({ message: "Shape not found" });
+        const existingShape = await prismaClient.chat.findFirst({
+            where: {
+                message: {
+                    contains: `"id":${shapeId}`, // Finds JSON objects containing this ID
+                },
+            },
+        });
+        console.log(existingShape)
+        if (!existingShape) {
+            return res.status(401).json({ message: "Shape not found" });
         }
-
+        console.log(existingShape)
+        // Delete the chat entry containing the shape
+        const deletedShape = await prismaClient.chat.delete({
+            where: { id: existingShape.id }, // Delete using the main ID
+        });
         res.status(200).json({ message: "Shape deleted successfully" });
     } catch (error) {
         console.error("Error deleting shape:", error);

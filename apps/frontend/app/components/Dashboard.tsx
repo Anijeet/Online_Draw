@@ -16,7 +16,9 @@ const Dashboard = () => {
     const[email,setEmail]=useState('')
     const[isHover,setIsHover]=useState(false)
     const[loading,setLoading]=useState(false)
+    const [canvasLoading, setCanvasLoading] = useState(false);
     const [roomName, setRoomName] = useState("");
+    const[roomID,setRoomID]=useState("")
     const [roomId, setRoomId] = useState(null);
     const adminId=localStorage.getItem("adminId")
     const token =localStorage.getItem('token')
@@ -93,8 +95,22 @@ const Dashboard = () => {
         }
     };
 
+    const joinRoom=()=>{
+      async function Join(){
+        const response = await axios.get(`${HTTP_BACKEND}/check-roomsid/${roomID}`)
+        if(response.status===200){
+          router.push(`/canvas/${roomID}`)
+        }else{
+          toast.error("Room not found")
+        }
+      }
+    }
     const deleteRoom= async (roomId:number)=>{
+      setLoading(true)
+      document.body.classList.add("cursor-wait");
         await axios.delete(`${HTTP_BACKEND}/room/delete/${roomId}`)
+        document.body.classList.remove("cursor-wait");
+      setLoading(false);
         fetchRooms()
     }
 
@@ -102,6 +118,8 @@ const Dashboard = () => {
         localStorage.removeItem('token')
         router.push('/')
     }
+
+    
   return (
     <div>
       <div className="fixed top-0 p-5 w-screen h-[80px] flex justify-between items-center bg-slate-200 shadow-md rounded shadow-slate-500">
@@ -129,20 +147,37 @@ const Dashboard = () => {
         }} className="pr-20 pl-2 rounded-lg border-2 border-black" type="text" placeholder="Room name"/>
         <Button onClick={handleCreateRoom}  className="border-2 py-2 px-3 font-semibold rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa]">{loading ? "Creating..." : "Create Room"}</Button>
       </div>
+      <div className="text-3xl font-bold w-full justify-center flex mt-5">Or</div>
+      <div className="w-full justify-center flex mt-10 gap-3" >
+        <input value={roomID}
+         onChange={(e)=>{
+            setRoomID(e.target.value);
+        }} className="pr-20 pl-2 rounded-lg border-2 border-black" type="text" placeholder="Room Id"/>
+        <Button onClick={joinRoom}  className="border-2 py-2 px-3 font-semibold rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa]">{loading ? "Creating..." : "Join Room"}</Button>
+      </div>
       <div className="grid grid-cols-4 p-20 gap-10">
 
       {rooms.map((room) => (
           <Card 
           onClick={()=>{
+            setCanvasLoading(true);
+            document.body.classList.add("cursor-wait");
             //@ts-ignore
             router.push(`/canvas/`+room.id)
+            
+            setTimeout(() => {
+              document.body.classList.remove("cursor-wait");
+              setCanvasLoading(false);
+            }, 5000);
             
           }}
           deleteIcons={<MdOutlineDelete/>}
           //@ts-ignore
           deleteClick={() => deleteRoom(parseInt(room.id))}
+          deleteClassName={`px-3 py-5 flex h-[20px] items-center gap-1 ${loading ? "cursor-wait" : ""}`}
+          DeleteName="Detele"
           //@ts-ignore
-           title={room.slug} textClassName="font-bold text-gray-300  capitalize text-2xl" className="card w-[230px] h-[200px] flex justify-center cursor-pointer items-center "/>
+           title={room.slug} textClassName="font-bold text-gray-300  capitalize text-2xl" className={`card w-[230px] h-[200px] flex justify-center cursor-pointer items-center ${canvasLoading ? "cursor-wait" : ""}`}/>
         ))}
       </div>
       <ToastContainer />

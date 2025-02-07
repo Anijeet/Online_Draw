@@ -6,11 +6,12 @@ import { WS_URL } from "@/config";
 import { Canvas } from "./Canvas";
 
 export function RoomCanvas({roomId}:{roomId:string}){
+    const token = localStorage.getItem("token")
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [socket,setSocket] = useState<WebSocket | null>(null);
 
     useEffect(()=>{
-        const ws = new WebSocket(`${WS_URL}?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZjYxZTkxMS1hODgzLTRjNzUtOTI1MS1hNDJmNzhlYWVjMjIiLCJpYXQiOjE3MzgxNDQ1MTZ9.rd9r-2_TdMMCqAWb0KoqKv1vZq9SUsO_cVfSnSjM_MQ`)
+        const ws = new WebSocket(`${WS_URL}?token=${token}`)
 
         ws.onopen=()=>{
             setSocket(ws);
@@ -25,11 +26,11 @@ export function RoomCanvas({roomId}:{roomId:string}){
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (!socket) {
-                window.location.reload(); // Reload the page if socket is still null
+                window.location.reload(); 
             }
-        }, 1000); // Wait for 3 seconds
+        }, 1000); 
 
-        return () => clearTimeout(timeout); // Cleanup the timeout
+        return () => clearTimeout(timeout); 
     }, [socket]);
 
     if(!socket){

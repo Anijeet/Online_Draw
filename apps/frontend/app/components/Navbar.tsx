@@ -1,11 +1,32 @@
+"use client"
+
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { FaGithub } from "react-icons/fa";
 import { Button } from "@repo/ui/button";
 import { FaRegStar } from "react-icons/fa";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 
 const Navbar = () => {
+  const [loading, setLoading] = useState(false);
+  
+    useEffect(() => {
+      return () => {
+        document.body.classList.remove("cursor-wait"); // Reset cursor when unmounted
+      };
+    }, []);
+
+    const handleClick = () => {
+      setLoading(true);
+      document.body.classList.add("cursor-wait"); // Set loading cursor
+  
+      // Remove loading cursor after page transition (using a delay)
+      setTimeout(() => {
+        document.body.classList.remove("cursor-wait");
+        setLoading(false);
+      }, 1000); // Adjust delay as needed based on page load time
+    };
   return (
     <div className="w-full p-5 fixed top-0 flex pr-14 items-center justify-between bg-white bg-opacity-80">
       <div className=" items-center flex">
@@ -28,9 +49,10 @@ const Navbar = () => {
           <FaGithub />1.1k
         </div>
         <div>
-          <Link href={'/signin'}>
-            <Button className="border-2 py-2 px-3 rounded-xl border-[#efe9e5] hover:bg-[#f9dcc8] ">
-              Sign In
+          <Link href={'/signin'} onClick={handleClick}>
+            <Button className={`border-2 py-2 px-3 rounded-xl border-[#efe9e5] hover:bg-[#f9dcc8] ${
+                loading ? "cursor-wait" : ""}`}>
+              {loading ? "Loading..." : "Sign In"}
             </Button>{" "}
           </Link>
         </div>

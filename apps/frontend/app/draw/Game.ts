@@ -8,12 +8,14 @@ type Shape = {
     y: number;
     width: number;
     height: number;
+    color:string;
 } | {
     id:number;
     type: "circle";
     centerX: number;
     centerY: number;
     radius: number;
+    color:string;
 } | {
     id:number;
     type: "line";
@@ -21,15 +23,18 @@ type Shape = {
     startY: number;
     endX: number;
     endY: number;
+    color:string;
 } | {
     id:number;
     type: "pencil";
-    path: { startX: number, startY: number, endX: number, endY: number }[]; // Path for pencil tool
+    path: { startX: number, startY: number, endX: number, endY: number }[]; 
+    color:string;
 } | {
     type: "eraser";
     x: number;
     y: number;
     size: number;
+    color?:string
   };
 
 export class Game {
@@ -45,11 +50,20 @@ export class Game {
     private scale: number = 1;
     private panX: number = 0;
     private panY: number = 0;
+    private red: boolean;
+    private green: boolean;
+    private blue: boolean;
+    private yellow: boolean;
+    private orange: boolean;
+    private purple: boolean;
+    private gray: boolean;
+    private white: boolean;
+    private pink: boolean;
 
     socket: WebSocket;
     private pencilPath: { startX: number, startY: number, endX: number, endY: number }[] = []; // To store pencil path
 
-    constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
+    constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket,red:boolean,blue:boolean,gray:boolean,green:boolean,pink:boolean,white:boolean,orange:boolean,yellow:boolean,purple:boolean) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
         this.existingShapes = [];
@@ -58,6 +72,15 @@ export class Game {
         this.clicked = false;
         this.canvas.width = document.body.clientWidth;
         this.canvas.height = document.body.clientHeight;
+        this.red=red;
+        this.blue=blue;
+        this.gray=green;
+        this.green=gray;
+        this.pink=pink;
+        this.white=white;
+        this.orange=orange;
+        this.yellow=yellow;
+        this.purple=purple;
         this.init();
         this.initHandlers();
         this.initMouseHandlers();
@@ -92,6 +115,18 @@ export class Game {
             }
         };
     }
+    getSelectedColor(): string {
+        if (this.red) return "red";
+        if (this.blue) return "blue";
+        if (this.green) return "green";
+        if (this.yellow) return "yellow";
+        if (this.orange) return "orange";
+        if (this.purple) return "purple";
+        if (this.gray) return "gray";
+        if (this.white) return "white";
+        if (this.pink) return "pink";
+        return "white"; 
+    }
 
     clearCanvas() {
         this.ctx.setTransform(this.scale, 0, 0, this.scale, this.panX, this.panY);
@@ -110,8 +145,11 @@ export class Game {
         );
 
         this.existingShapes.map((shape) => {
+           
+            //@ts-ignore
+            this.ctx.strokeStyle = shape.color ;
+        
             if (shape.type === "rect") {
-                this.ctx.strokeStyle = "rgba(255, 255, 255)";
                 this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
             } else if (shape.type === "circle") {
                 this.ctx.beginPath();
@@ -125,7 +163,6 @@ export class Game {
                 this.ctx.stroke();
                 this.ctx.closePath();
             } else if (shape.type === "pencil") {
-                this.ctx.strokeStyle = "rgba(255, 255, 255)";
                 if (Array.isArray(shape.path)) {
                     shape.path.forEach((segment) => {
                         this.ctx.beginPath();
@@ -158,7 +195,6 @@ export class Game {
             }];
         }
     };
-
    
 
     isPointInsideShape(x: number, y: number, shape: Shape): boolean {
@@ -281,12 +317,22 @@ export class Game {
                             ) / Math.sqrt(Math.pow(lineEndY - lineStartY, 2) + Math.pow(lineEndX - lineStartX, 2));
                             shouldKeep = distanceToLine > eraser.size;
                             break;
+                        case "pencil":
+                            shouldKeep = !shape.path.some(segment => {
+                                const distanceToSegment = Math.hypot(
+                                    eraser.x - segment.startX,
+                                    eraser.y - segment.startY
+                                );
+                                return distanceToSegment < eraser.size;
+                            });
+                            break;
+                    
                     }
             
                     if (!shouldKeep) {
                         erasedShapes.push(shape);
                     }
-                    
+                    console.log('erase',erasedShapes)
                     return shouldKeep;
                 });
             
@@ -304,11 +350,13 @@ export class Game {
         }
     };
 
+    
     mouseUpHandler = (e: MouseEvent) => {
         const width = (e.clientX - this.startX) / this.scale;
         const height = (e.clientY - this.startY) / this.scale;
 
         const selectedTool = this.selectedTool;
+        let selectedColor = this.getSelectedColor();
         let shape: Shape | null = null;
         if (selectedTool === "rect") {
 
@@ -318,7 +366,8 @@ export class Game {
                 x: (this.startX - this.panX) / this.scale,
                 y: (this.startY - this.panY) / this.scale,
                 height,
-                width
+                width,
+                color:selectedColor
             }
             if (!shape) {
                 return;
@@ -341,6 +390,7 @@ export class Game {
                 radius: radius,
                 centerX: ((this.startX - this.panX) / this.scale) + radius,
                 centerY: ((this.startY - this.panY) / this.scale) + radius,
+                color:selectedColor
             } 
             if (!shape) {
                 return;
@@ -363,6 +413,7 @@ export class Game {
                 startY: (this.startY - this.panY) / this.scale,
                 endX: (e.clientX - this.panX) / this.scale,
                 endY: (e.clientY - this.panY) / this.scale,
+                color:selectedColor
             }
             if (!shape) {
                 return;
@@ -408,7 +459,7 @@ export class Game {
 
         const mouseX = e.clientX - this.canvas.offsetLeft;
         const mouseY = e.clientY - this.canvas.offsetTop;
-        // Position of cursor on canvas
+       
         const canvasMouseX = (mouseX - this.panX) / this.scale;
         const canvasMouseY = (mouseY - this.panY) / this.scale;
 

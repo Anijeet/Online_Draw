@@ -14,7 +14,7 @@ export async function getExistingShapes(roomId: string) {
 }
 
 export async function deleteShapeFromDB( shape: any) {
-    console.log("shape",shape)
+    console.log("shape",shape.id)
     try {
         const response = await fetch(`${HTTP_BACKEND}/chats/delete-shape`, {
             method: "POST",
