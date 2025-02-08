@@ -62,7 +62,17 @@ wss.on('connection', function connection(ws, request) {
 
     if (parsedData.type === "join_room") {
       const user = users.find(x => x.ws === ws);
+      //@ts-ignore
+      console.log(user.userId)
       user?.rooms.push(parsedData.roomId);
+
+      
+
+      // ws.send(JSON.stringify({
+      //   type: "user_id",
+      //   //@ts-ignore
+      //   userId: user.userId
+    // }));
     }
 
     if (parsedData.type === "leave_room") {

@@ -57,9 +57,9 @@ const Navbar = () => {
           </Link>
         </div>
         <div>
-          <Button className="border-2 py-2 px-3 rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa] ">
+          <Link href={'/signin'} className="border-2 py-2 px-3 rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa] ">
             Free Board
-          </Button>{" "}
+          </Link>{" "}
         </div>
       </div>
     </div>

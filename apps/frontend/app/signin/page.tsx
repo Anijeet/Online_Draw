@@ -23,5 +23,5 @@ export default function Signin() {
         return <AuthPage isSignin={true} />;
     }
 
-    return <div>Redirecting...</div>;
+    return <div className="bg-slate-950">Redirecting...</div>;
 }

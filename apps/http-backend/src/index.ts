@@ -80,9 +80,10 @@ app.post('/signin', async (req, res) => {
 app.get('/check-roomsid/:roomId',async(req,res)=>{
     //@ts-ignore
     const roomId=parseInt(req.params.roomId)
-    const id = await prismaClient.room.findFirst({where:{id:roomId}})
-    if(id){
+    const response = await prismaClient.room.findFirst({where:{id:roomId}})
+    if(response){
         res.status(200).json({
+            response,
             msg:"Id exist"
         })
     }else{
@@ -91,6 +92,22 @@ app.get('/check-roomsid/:roomId',async(req,res)=>{
         })
     }
 })
+
+// app.get('/adminRoom/:adminId',async(req,res)=>{
+//     //@ts-ignore
+//     const adminId=req.params.adminId
+//     const response = await prismaClient.room.findMany({where:{adminId:adminId}})
+//     if(response){
+//         res.status(200).json({
+//             response,
+           
+//         })
+//     }else{
+//         res.status(404).json({
+//             msg:"Id doesn't exist"
+//         })
+//     }
+// })
 
 
 

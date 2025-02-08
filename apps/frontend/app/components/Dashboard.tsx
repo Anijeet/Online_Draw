@@ -14,8 +14,9 @@ const Dashboard = () => {
     const [id, setId] = useState([]);
     const [name,setName]=useState('')
     const[email,setEmail]=useState('')
-    const[isHover,setIsHover]=useState(false)
+    const[joinloading,setJoinLoading]=useState(false)
     const[loading,setLoading]=useState(false)
+    const[cursorLoading,setCursorLoading]=useState(false)
     const [canvasLoading, setCanvasLoading] = useState(false);
     const [roomName, setRoomName] = useState("");
     const[roomID,setRoomID]=useState("")
@@ -83,7 +84,7 @@ const Dashboard = () => {
                 setRoomId(response.data.roodmid);
                 toast.success("Room created successfully!");
                 fetchRooms()
-                // router.push(`/canvas/`+ roomId)
+                
             } else {
                 toast.error("Failed to create room!");
             }
@@ -97,13 +98,21 @@ const Dashboard = () => {
 
     const joinRoom=()=>{
       async function Join(){
+        try {
+          setJoinLoading(true)
         const response = await axios.get(`${HTTP_BACKEND}/check-roomsid/${roomID}`)
+        console.log(response.status)
         if(response.status===200){
           router.push(`/canvas/${roomID}`)
-        }else{
+          
+        }
+        } catch (error) {
           toast.error("Room not found")
+          setJoinLoading(false)
         }
       }
+
+      Join()
     }
     const deleteRoom= async (roomId:number)=>{
       setLoading(true)
@@ -115,8 +124,12 @@ const Dashboard = () => {
     }
 
     const logout = ()=>{
+      setCursorLoading(true)
+      document.body.classList.add("cursor-wait");
         localStorage.removeItem('token')
         router.push('/')
+        document.body.classList.remove("cursor-wait");
+        setCursorLoading(false)
     }
 
     
@@ -131,7 +144,7 @@ const Dashboard = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Button onClick={logout} className="border-2 py-2 px-3 font-semibold rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa] ">
+          <Button onClick={logout} className={`border-2 py-2 px-3 font-semibold rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa]  ${cursorLoading ? "cursor-wait" : ""}`} >
             Log Out
           </Button>
           <h1 className="bg-orange-500 rounded-full p-3 px-5 cursor-pointer capitalize ">{name}</h1>
@@ -153,12 +166,12 @@ const Dashboard = () => {
          onChange={(e)=>{
             setRoomID(e.target.value);
         }} className="pr-20 pl-2 rounded-lg border-2 border-black" type="text" placeholder="Room Id"/>
-        <Button onClick={joinRoom}  className="border-2 py-2 px-3 font-semibold rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa]">{loading ? "Creating..." : "Join Room"}</Button>
+        <Button onClick={joinRoom}  className="border-2 py-2 px-3 font-semibold rounded-xl bg-[#FFBC85] border-[#FFBC85] hover:bg-[#f5ab79fa]">{joinloading ? "Joining..." : "Join Room"}</Button>
       </div>
-      <div className="grid grid-cols-4 p-20 gap-10">
+      <div  className="grid grid-cols-4 p-20 gap-10">
 
       {rooms.map((room) => (
-          <Card 
+          <Card key={roomId}
           onClick={()=>{
             setCanvasLoading(true);
             document.body.classList.add("cursor-wait");

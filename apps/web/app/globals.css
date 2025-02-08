@@ -21,6 +21,15 @@ body {
   overflow-x: hidden;
 }
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Edge */
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

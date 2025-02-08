@@ -1,7 +1,9 @@
-import { Button } from "@repo/ui/button";
 import { Card } from "@repo/ui/card";
+import Link from "next/link";
+
 
 const ContentSection = () => {
+  
   return (
     <div className="p-3 mt-5 w-full pl-32 flex ">
       <h2 className="bg-[#c76727]   w-2 h-[800px] rounded-3xl"></h2>
@@ -111,7 +113,7 @@ const ContentSection = () => {
           </p>
         </div>
         <div className="flex gap-10">
-        <Button children="Draw now" className="bg-[#ea8a4a] border-2 border-[#c76727] p-2 px-10 ml-10 rounded-lg hover:bg-transparent transition-all duration-300" />
+        <Link href={'/signin'}  className="bg-[#ea8a4a] border-2 border-[#c76727] p-2 px-10 ml-10 rounded-lg hover:bg-transparent transition-all duration-300" >Draw now</Link>
         </div>
       </div>
       </div>

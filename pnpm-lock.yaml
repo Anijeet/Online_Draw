@@ -26,9 +26,15 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@types/bcrypt':
+        specifier: ^5.0.2
+        version: 5.0.2
       axios:
         specifier: ^1.7.9
         version: 1.7.9
+      bcrypt:
+        specifier: ^5.1.1
+        version: 5.1.1
       lucide-react:
         specifier: ^0.474.0
         version: 0.474.0(react@19.0.0)
