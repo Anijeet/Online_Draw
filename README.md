@@ -68,6 +68,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Demo Video
 
 
+https://github.com/user-attachments/assets/d4bf8309-2674-4eb1-984e-4bc17e3b29ce
+
+
+
+
 https://github.com/user-attachments/assets/ad4dd765-fc31-44d4-8984-8be4996770ef
 
 
