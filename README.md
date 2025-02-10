@@ -64,3 +64,10 @@ The project uses a microservices architecture:
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Demo Video
+
+
+https://github.com/user-attachments/assets/ad4dd765-fc31-44d4-8984-8be4996770ef
+
+
